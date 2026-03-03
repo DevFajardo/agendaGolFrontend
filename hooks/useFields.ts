@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import type { Field } from "@/services/fieldService";
+
+interface FieldsResponse {
+  fields?: Field[];
+}
 
 export const useFields = () => {
-  const [fields, setFields] = useState([]); // Iniciamos como array vacío siempre
+  const [fields, setFields] = useState<Field[]>([]); // Iniciamos como array vacío siempre
   const [loading, setLoading] = useState(true);
   const { token } = useAuthStore();
 
@@ -16,10 +21,16 @@ export const useFields = () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      const data = await res.json();
+      const data = (await res.json()) as Field[] | FieldsResponse;
 
-      // Si el backend manda un array, lo guardamos. Si no, forzamos array vacío.
-      setFields(Array.isArray(data) ? data : []);
+      // Si el backend manda array directo o dentro de { fields }, lo soportamos.
+      setFields(
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data.fields)
+            ? data.fields
+            : [],
+      );
     } catch {
       setFields([]);
     } finally {
