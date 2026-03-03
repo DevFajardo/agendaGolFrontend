@@ -20,7 +20,7 @@ export const StatusModal = ({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in fade-in zoom-in duration-300">
         <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${type === "success" ? "bg-green-100" : "bg-red-100"}`}>
           {type === "success" ? (

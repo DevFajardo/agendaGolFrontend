@@ -205,7 +205,7 @@ export default function UserDashboard() {
       )}
 
       {selectedCourt && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-100 p-4">
           <div className="bg-white rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl relative">
             <button
               onClick={() => setSelectedCourt(null)}

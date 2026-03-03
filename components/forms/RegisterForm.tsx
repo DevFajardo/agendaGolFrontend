@@ -79,7 +79,7 @@ export const RegisterForm = () => {
       {/* NOTIFICACIONES (TOASTS) */}
       {feedback.show && (
         <div
-          className={`fixed bottom-8 right-8 z-[200] px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-2xl animate-in fade-in slide-in-from-right-4 ${
+          className={`fixed bottom-8 right-8 z-200 px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-2xl animate-in fade-in slide-in-from-right-4 ${
             feedback.type === "success"
               ? "bg-white text-slate-900"
               : "bg-red-600 text-white"

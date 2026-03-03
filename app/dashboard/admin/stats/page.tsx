@@ -67,7 +67,7 @@ export default function StatsPage() {
     return (
       <div className="h-[calc(100vh-160px)] flex flex-col space-y-4 animate-pulse">
         {/* Skeleton del Header */}
-        <div className="flex-shrink-0 space-y-2">
+        <div className="shrink-0 space-y-2">
           <div className="h-8 w-64 bg-slate-200 rounded-lg"></div>
           <div className="h-4 w-96 bg-slate-100 rounded-lg"></div>
         </div>

@@ -109,7 +109,7 @@ export default function AdminPage() {
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm h-[300px]"
+              className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm h-75"
             ></div>
           ))}
         </div>
@@ -172,7 +172,7 @@ export default function AdminPage() {
 
       {/* MODAL CREAR/EDITAR */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md">
           <div className="relative bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl animate-in zoom-in duration-300">
             <button
               onClick={closeModal}
@@ -225,7 +225,7 @@ export default function AdminPage() {
               />
               <textarea
                 placeholder="DESCRIPCIÓN"
-                className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-green-500/20 transition-all min-h-[100px] resize-none"
+                className="w-full bg-slate-50 p-5 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-green-500/20 transition-all min-h-25 resize-none"
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
@@ -263,7 +263,7 @@ export default function AdminPage() {
               </div>
               <button
                 disabled={isSubmitting}
-                className="cursor-pointer w-full bg-slate-950 text-white py-5 mt-4 rounded-[1.5rem] font-black uppercase text-xs tracking-widest hover:bg-green-600 active:scale-95 transition-all shadow-xl disabled:opacity-50"
+                className="cursor-pointer w-full bg-slate-950 text-white py-5 mt-4 rounded-3xl font-black uppercase text-xs tracking-widest hover:bg-green-600 active:scale-95 transition-all shadow-xl disabled:opacity-50"
               >
                 {isSubmitting ? "Sincronizando..." : "Guardar Cambios"}
               </button>
@@ -274,7 +274,7 @@ export default function AdminPage() {
 
       {/* TOAST DE ÉXITO - ESQUINA INFERIOR DERECHA */}
       {feedback.show && (
-        <div className="fixed bottom-8 right-8 z-[200] bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-2xl animate-in fade-in slide-in-from-right-4">
+        <div className="fixed bottom-8 right-8 z-200 bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-2xl animate-in fade-in slide-in-from-right-4">
           {feedback.msg}
         </div>
       )}

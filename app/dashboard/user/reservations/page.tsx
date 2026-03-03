@@ -190,7 +190,7 @@ export default function ReservationsPage() {
               <button
                 onClick={handleUpdate}
                 disabled={isUpdating}
-                className="cursor-pointer w-full py-5 bg-green-500 text-white rounded-[2rem] font-black uppercase shadow-lg shadow-blue-200 active:scale-95 transition-all"
+                className="cursor-pointer w-full py-5 bg-green-500 text-white rounded-4xl font-black uppercase shadow-lg shadow-blue-200 active:scale-95 transition-all"
               >
                 {isUpdating ? "GUARDANDO..." : "CONFIRMAR CAMBIO"}
               </button>
