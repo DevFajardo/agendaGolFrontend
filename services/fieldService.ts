@@ -1,5 +1,3 @@
-import { mockFieldsService, shouldUseMocks } from "./mockData";
-
 export interface Field {
   id: number;
   name: string;
@@ -32,25 +30,19 @@ const fieldsApiUrl = process.env.NEXT_PUBLIC_FIELDS_API_URL;
 export const fieldService = {
   // Lista canchas para administración.
   list: async (token: string): Promise<Field[]> => {
-    if (shouldUseMocks()) {
-      return mockFieldsService.list();
+    const res = await fetch(`${fieldsApiUrl}/?skip=0&limit=100`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("No se pudieron cargar las canchas");
     }
 
-    try {
-      const res = await fetch(`${fieldsApiUrl}/?skip=0&limit=100`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache",
-        },
-      });
-
-      if (!res.ok) return mockFieldsService.list();
-
-      const data = (await res.json()) as FieldsResponse;
-      return Array.isArray(data.fields) ? data.fields : [];
-    } catch {
-      return mockFieldsService.list();
-    }
+    const data = (await res.json()) as FieldsResponse;
+    return Array.isArray(data.fields) ? data.fields : [];
   },
 
   // Crea o actualiza cancha según exista editingId.
@@ -59,78 +51,52 @@ export const fieldService = {
     payload: FieldFormData,
     editingId?: number | null,
   ): Promise<boolean> => {
-    if (shouldUseMocks()) {
-      return mockFieldsService.save(payload, editingId);
-    }
-
     const price = parseFloat(payload.price_per_hour);
     const cap = parseInt(payload.capacity, 10);
 
     const url = editingId ? `${fieldsApiUrl}/${editingId}` : `${fieldsApiUrl}`;
     const method = editingId ? "PATCH" : "POST";
 
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...payload,
-          price_per_hour: price || 0,
-          capacity: cap || 0,
-          is_active: true,
-        }),
-      });
+    const res = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...payload,
+        price_per_hour: price || 0,
+        capacity: cap || 0,
+        is_active: true,
+      }),
+    });
 
-      return res.ok ? true : mockFieldsService.save(payload, editingId);
-    } catch {
-      return mockFieldsService.save(payload, editingId);
-    }
+    return res.ok;
   },
 
   // Elimina cancha por id.
   remove: async (token: string, id: number): Promise<boolean> => {
-    if (shouldUseMocks()) {
-      return mockFieldsService.remove(id);
-    }
+    const res = await fetch(`${fieldsApiUrl}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    try {
-      const res = await fetch(`${fieldsApiUrl}/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      return res.ok ? true : mockFieldsService.remove(id);
-    } catch {
-      return mockFieldsService.remove(id);
-    }
+    return res.ok;
   },
 
   // Consulta horas disponibles para fecha/cancha específica.
   getAvailability: async (courtId: number, date: string): Promise<string[]> => {
-    const normalizedDate = date.split("T")[0];
+    const res = await fetch(
+      `${fieldsApiUrl}/${courtId}/availability?date=${encodeURIComponent(
+        date.split("T")[0],
+      )}`,
+    );
 
-    if (shouldUseMocks()) {
-      return mockFieldsService.availability(courtId, normalizedDate);
+    if (!res.ok) {
+      throw new Error("No se pudo consultar disponibilidad");
     }
 
-    try {
-      const res = await fetch(
-        `${fieldsApiUrl}/${courtId}/availability?date=${encodeURIComponent(
-          normalizedDate,
-        )}`,
-      );
-
-      if (!res.ok) return mockFieldsService.availability(courtId, normalizedDate);
-
-      const data = (await res.json()) as AvailabilityResponse;
-      return Array.isArray(data.available_hours)
-        ? data.available_hours
-        : mockFieldsService.availability(courtId, normalizedDate);
-    } catch {
-      return mockFieldsService.availability(courtId, normalizedDate);
-    }
+    const data = (await res.json()) as AvailabilityResponse;
+    return Array.isArray(data.available_hours) ? data.available_hours : [];
   },
 };

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/services/apiConfig";
-import { mockStatsService, shouldUseMocks } from "@/services/mockData";
 
 interface GeneralStatsResponse {
   general_stats?: {
@@ -41,13 +40,6 @@ export default function StatsPage() {
 
   useEffect(() => {
     const fetchAllStats = async () => {
-      if (shouldUseMocks()) {
-        const mockData = mockStatsService.getDashboardData();
-        setData(mockData);
-        setLoading(false);
-        return;
-      }
-
       try {
         const [resGeneral, resFields, resRevenue] = await Promise.all([
           api.get(`${process.env.NEXT_PUBLIC_ADMIN_API_URL}/stats`),
@@ -63,8 +55,6 @@ export default function StatsPage() {
         });
       } catch (error) {
         console.error("Error capturado:", error);
-        const mockData = mockStatsService.getDashboardData();
-        setData(mockData);
       } finally {
         setLoading(false);
       }
