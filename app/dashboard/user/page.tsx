@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { courtsApi } from "@/services/apiConfig";
 import { useAuthStore } from "@/store/useAuthStore";
 import { StatusModal } from "@/components/modals/StatusModal";
 import { CourtCard } from "@/components/cards/CourtCard";
@@ -21,10 +20,6 @@ interface Court {
   description?: string;
   price_per_hour: number;
   is_active: boolean;
-}
-
-interface FieldsResponse {
-  fields?: Court[];
 }
 
 export default function UserDashboard() {
@@ -75,15 +70,12 @@ export default function UserDashboard() {
     const fetchCourts = async () => {
       try {
         setLoading(true);
-        const { data } = await courtsApi.get("/fields?skip=0&limit=100");
-        const typedData = data as FieldsResponse;
-        if (typedData && typedData.fields) {
-          const activeOnly = typedData.fields.filter((f) => f.is_active !== false);
-          const sorted = activeOnly.reverse();
-          const startIndex = 0;
-          const paginated = sorted.slice(startIndex, startIndex + limit);
-          setCourts(paginated);
-        }
+        const allFields = await fieldService.list(token || "");
+        const activeOnly = allFields.filter((f) => f.is_active !== false);
+        const sorted = activeOnly.reverse();
+        const startIndex = 0;
+        const paginated = sorted.slice(startIndex, startIndex + limit);
+        setCourts(paginated);
       } catch {
         setCourts([]);
       } finally {
@@ -91,7 +83,7 @@ export default function UserDashboard() {
       }
     };
     fetchCourts();
-  }, []);
+  }, [token]);
 
   // Consulta disponibilidad real por cancha y fecha.
   const fetchAvailability = async (courtId: number, date: string) => {

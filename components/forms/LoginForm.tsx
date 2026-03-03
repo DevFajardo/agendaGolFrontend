@@ -7,9 +7,9 @@ import { loginSchema, LoginInput } from "@/lib/validations/auth";
 import { FormField } from "../ui/FormField";
 import { Button } from "../ui/Button";
 import { useAuthStore } from "@/store/useAuthStore";
-import api from "@/services/apiConfig";
+import { authService, buildUserFromToken } from "@/services/authService";
 import Cookies from "js-cookie";
-import { isAxiosError } from "axios";
+import axios from "axios";
 
 export const LoginForm = () => {
   const [loading, setLoading] = useState(false);
@@ -24,23 +24,14 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  // Estructura esperada del payload JWT devuelto por backend.
-  interface JWTPayload {
-    user_id: number;
-    sub: string;
-    email: string;
-    is_admin: boolean;
-  }
-
   const onSubmit = async (data: LoginInput) => {
     // Reinicia estado de UI antes de iniciar autenticación.
     setLoading(true);
     setErrorMsg(null);
 
     try {
-      // 1) Autentica credenciales contra backend.
-      const response = await api.post("/auth/login", data);
-      const resData = response.data;
+      // 1) Autentica credenciales contra backend o modo mock.
+      const resData = await authService.login(data);
 
       const token = resData.access_token || resData.token;
 
@@ -48,37 +39,32 @@ export const LoginForm = () => {
         throw new Error("No se recibió un token de acceso.");
       }
 
-      // 2) Decodifica JWT localmente para armar el usuario frontend.
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(window.atob(base64)) as JWTPayload;
+      // 2) Usuario desde respuesta o token (fallback).
+      const userData =
+        resData.user ||
+        resData.user_data ||
+        buildUserFromToken(token);
 
-      // 3) Mapea campos backend al shape usado por Zustand.
-      const roleValue = payload.is_admin
-        ? ("admin" as const)
-        : ("user" as const);
-
-      const userData = {
-        id: String(payload.user_id),
-        username: payload.sub,
-        name: payload.sub,
-        email: payload.email,
-        role: roleValue,
-      };
+      if (!userData || !userData.email) {
+        throw new Error("No se pudo obtener el usuario autenticado.");
+      }
 
       // 4) Persiste sesión en store + cookies para navegación y refresh.
       setAuth(userData, token);
 
       Cookies.set("auth-token", token, { expires: 7, path: "/" });
-      Cookies.set("user-role", userData.role, { expires: 7, path: "/" });
+      Cookies.set("user-role", userData.is_admin ? "admin" : "user", {
+        expires: 7,
+        path: "/",
+      });
 
       // 5) Redirige al dashboard correspondiente al rol.
-      window.location.href = `/dashboard/${userData.role}`;
+      window.location.href = `/dashboard/${userData.is_admin ? "admin" : "user"}`;
     } catch (err: unknown) {
       // Manejo tipado de errores de red y errores genéricos.
       console.warn("Fallo en la autenticación");
 
-      if (isAxiosError(err)) {
+      if (axios.isAxiosError(err)) {
         const detail = err.response?.data?.detail;
         setErrorMsg(
           typeof detail === "string" ? detail : "Error en el servidor",

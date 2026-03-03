@@ -30,6 +30,27 @@ Notas:
 - `NEXT_PUBLIC_RESERVATIONS_API_URL` puede omitirse si `NEXT_PUBLIC_BASE_URL_FIELDS` está definida (el frontend usa fallback a `/reservations`).
 - Ajusta puertos/hosts según tu backend local.
 
+## Modo demo (sin backend)
+
+Si la API no está disponible, el frontend ahora entra en modo mock automáticamente y usa datos falsos para demo.
+
+También puedes forzarlo con:
+
+```env
+NEXT_PUBLIC_USE_MOCK=true
+```
+
+Credenciales demo por defecto:
+
+- Admin: `admin@gmail.com` / `123456`
+- Usuario: `user@gmail.com` / `123456`
+
+Datos demo incluidos:
+
+- Canchas falsas precargadas
+- Reservas falsas precargadas
+- Estadísticas admin calculadas en frontend
+
 ## Comandos para ejecutar el proyecto
 
 ```bash
