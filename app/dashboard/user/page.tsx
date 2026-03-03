@@ -19,7 +19,7 @@ interface Court {
   location: string;
   description?: string;
   price_per_hour: number;
-  is_active?: boolean;
+  is_active: boolean;
 }
 
 export default function UserDashboard() {
